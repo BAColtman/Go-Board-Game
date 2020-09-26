@@ -1,5 +1,14 @@
 #include "board.h"
 
+void initialiseBoard(board_t &board)
+{
+	for (position_t position{ 0 }; position < constants::pointNumber; position++)
+	{
+		board.at(position).setPosition(position);
+		board.at(position).setLiberties(neighbourPositions(position));
+	}
+}
+
 //Function to show the current status of the gaming board
 void displayBoard(board_t &board, lettersArray_t& letters)
 {
@@ -12,21 +21,21 @@ void displayBoard(board_t &board, lettersArray_t& letters)
 	}
 	std::cout << "\n";
 	//more formatting to get the board to line up
-	if (boardSize < 10)
+	if (constants::boardSize < 10)
 		std::cout << " ";
 	std::cout << boardLabelReverse(0) << " ";
-	for (int i{ 1 }; i <= pointNumber; i++)
+	for (int i{ 1 }; i <= constants::pointNumber; i++)
 	{
 		//prints the current contents of each point
-		std::cout << stoneColourToSymbol(board[i - zeroOffset].getColour()) << ' ';
+		std::cout << stoneColourToSymbol(board.at(i - constants::zeroOffset).getColour()) << ' ';
 		//makes a newline at the end of each row, and then prints the next label (apart from the last row)
-		if ((i % boardSize == 0) && (i != pointNumber))
+		if ((i % constants::boardSize == 0) && (i != constants::pointNumber))
 		{
 			std::cout << "\n";
 			//need an extra space for <10 to make the formatting nice
-			if (boardLabelReverse(i / boardSize) < 10)
+			if (boardLabelReverse(i / constants::boardSize) < 10)
 				std::cout << " ";
-			std::cout << boardLabelReverse(i / boardSize) << " ";
+			std::cout << boardLabelReverse(i / constants::boardSize) << " ";
 		}
 	}
 	std::cout << "\n\n";
@@ -35,29 +44,29 @@ void displayBoard(board_t &board, lettersArray_t& letters)
 neighbour_t neighbourPositions(position_t position)
 {
 	//I shall use -1 to mean invalid neighbour e.g. the left-most stones do not have left neighbours
-	neighbour_t neighbours{ noPosition,noPosition,noPosition,noPosition };
+	neighbour_t neighbours{ constants::noPosition, constants::noPosition, constants::noPosition, constants::noPosition };
 	//neighbours are listed in order of: up right down left
 
 	//check it's not on the top side of the board
-	if (position > (boardSize - zeroOffset))
+	if (position > (constants::boardSize - constants::zeroOffset))
 	{
-		neighbours.at(0) = position - boardSize;
+		neighbours.at(0) = position - constants::boardSize;
 	}
 
 	//check it's not on the right side of the board
-	if ((position + zeroOffset) % boardSize)
+	if ((position + constants::zeroOffset) % constants::boardSize)
 	{
 		neighbours.at(1) = position + 1;
 	}
 
 	//check it's not on the bottom side of the board
-	if (position < ((pointNumber - boardSize) - zeroOffset))
+	if (position < ((constants::pointNumber - constants::boardSize) - constants::zeroOffset))
 	{
-		neighbours.at(2) = position + boardSize;
+		neighbours.at(2) = position + constants::boardSize;
 	}
 
 	//check it's not on the left side of the board
-	if (position % boardSize)
+	if (position % constants::boardSize)
 	{
 		neighbours.at(3) = position - 1;
 	}
@@ -74,7 +83,7 @@ neighbour_t neighbourPositions(position_t position)
 }
 
 //tells us that the input is invalid and asks for another move
-position_t invalidMove(board_t& board)
+position_t askForAnotherMove(board_t& board)
 {
 	std::cout << "Invalid move, pick another\n\n";
 	return getMove(board);
@@ -82,7 +91,7 @@ position_t invalidMove(board_t& board)
 
 position_t moveInputToPosition(board_t& board, std::string move)
 {
-		int columnIndex{ letterToColumnNumber(move.at(0)) - zeroOffset };//this needs error checking
+		int columnIndex{ letterToColumnNumber(move.at(0)) - constants::zeroOffset };//this needs error checking
 		int rowIndex{ boardLabelReverse(numberCharactersToInteger(move)) };
 
 
@@ -90,14 +99,14 @@ position_t moveInputToPosition(board_t& board, std::string move)
 		position_t position{ boardIndex(rowIndex, columnIndex) };
 
 		//check if input is within bounds, before trying to access it
-		if ((position >= pointNumber) || (!isValidLetter(columnIndex)) || (!isValidLetter(rowIndex)) || (rowIndex == ERROR))
+		if ((position >= constants::pointNumber) || (!isValidLetter(columnIndex)) || (!isValidLetter(rowIndex)) || (rowIndex == constants::ERROR))
 		{
-			return invalidMove(board);
+			return askForAnotherMove(board);
 		}
 		//check whether there's a stone already there
-		else if (board[position].getColour() != StoneColour::empty)
+		else if (board.at(position).getColour() != StoneColour::empty)
 		{
-			return invalidMove(board);
+			return askForAnotherMove(board);
 		}
 		else
 			return position;
@@ -110,14 +119,15 @@ position_t getMove(board_t& board)
 	static int hasPass{ 0 };
 
 	//this bit of code is when we want to specify several inputs at once for debugging purposes
-	static int debugModeCountInput{ (!isDebug)*50 };// zero for isDebug = 1, 50 for isDebug = 0
-	if (debugModeCountInput < static_cast<int>(defaultInput.size()))
+	static int debugModeCountInput{ (!constants::isDebug)*50 };// zero for isDebug = 1, 50 for isDebug = 0
+	if (debugModeCountInput < static_cast<int>(constants::defaultInput.size()))
 	{
-		move = defaultInput[debugModeCountInput];
+		move = constants::defaultInput[debugModeCountInput];
 		debugModeCountInput++;
 	}
 	else
-		std::getline(std::cin, move);//This is what gets called if not in debug mode
+		//This is what gets called if not in debug mode
+		std::getline(std::cin, move);
 
 	std::cout << "\n";
 
@@ -125,11 +135,11 @@ position_t getMove(board_t& board)
 	if ((move == "pass") && (hasPass == 0))
 	{
 		hasPass = 1;
-		return flag;
+		return constants::flag;
 	}
 	else if ((move == "pass") && (hasPass == 1))
 	{
-		return endGameFlag;
+		return constants::endGameFlag;
 	}
 	else
 	{
@@ -143,18 +153,19 @@ position_t getMove(board_t& board)
 group_t mergeGroups(group_t group1, group_t group2)
 {
 	std::vector<groupElement_t> mergedGroup;
-	mergedGroup.reserve(group1.size() + group2.size()); // preallocate memory
+	//preallocate memory
+	mergedGroup.reserve(group1.size() + group2.size());
 	mergedGroup.insert(mergedGroup.end(), group1.begin(), group1.end());
 	mergedGroup.insert(mergedGroup.end(), group2.begin(), group2.end());
 
 	sortVectorDescending(mergedGroup);
 	//remove duplicates
-	groupElement_t lastElement{ noPosition };
+	groupElement_t lastElement{ constants::noPosition };
 	for (auto &currentElement : mergedGroup)
 	{
 		if (currentElement == lastElement)
 		{
-			currentElement = noPosition;
+			currentElement = constants::noPosition;
 		}
 		else
 		{
@@ -176,9 +187,8 @@ group_t mergeLiberties(group_t lib1, group_t lib2, group_t stoneGroup)
 		{
 			if (liberty == position)
 			{
-				liberty = noPosition;
+				liberty = constants::noPosition;
 			}
-			//std::cerr << liberty << " " << position << "\n";
 		}
 	}
 
@@ -190,8 +200,9 @@ group_t mergeLiberties(group_t lib1, group_t lib2, group_t stoneGroup)
 //compare size of groups and return them with the biggest one first
 std::array<Stones,2> biggerGroup(board_t board, Stones stoneWithGroupToAdd, Stones nodeStone)
 {
-	Stones newNode{ board[stoneWithGroupToAdd.getWhichGroup()] };
-	Stones oldNode{ board[nodeStone.getWhichGroup()] };//This should be just nodeStone, but I've made it reversable just in case
+	Stones newNode{ board.at(stoneWithGroupToAdd.getWhichGroup()) };
+	//This should be just nodeStone, but I've made it reversable just in case
+	Stones oldNode{ board.at(nodeStone.getWhichGroup()) };
 	if (newNode.getGroup().size() > oldNode.getGroup().size())
 	{
 		return { newNode, oldNode };
@@ -200,155 +211,158 @@ std::array<Stones,2> biggerGroup(board_t board, Stones stoneWithGroupToAdd, Ston
 		return { oldNode, newNode };
 }
 
-void addToGroup(board_t& board, position_t stoneToAddPosition, position_t groupMember)
+/*
+void addToGroupOld(board_t& board, position_t stoneToAddPosition, position_t groupMember)
 {
 
-	position_t groupNode{ board[groupMember].getWhichGroup() };
-	//Stones nodeStone{ board[groupNode] };
+	position_t groupNode{ board.at(groupMember].getWhichGroup() };
 
 	//if it is a single stone, point it to the group node and add it to the group
-	if (board[stoneToAddPosition].getWhichGroup() == board[stoneToAddPosition].getPosition())
+	if (board.at(stoneToAddPosition].getWhichGroup() == board.at(stoneToAddPosition].getPosition())
 	{
-		//Stones stoneToAdd = board[stoneToAddPosition];
+		//Stones stoneToAdd = board.at(stoneToAddPosition];
 
 		//set the group indicator of the new stone to the group indicator of the group it's joining
-		board[stoneToAddPosition].setWhichGroup(groupNode);
+		board.at(stoneToAddPosition].setWhichGroup(groupNode);
 		//add the stone to the group vector
-		board[groupNode].setGroup(mergeGroups(board[stoneToAddPosition].getGroup(), board[groupNode].getGroup()));
+		board.at(groupNode].setGroup(mergeGroups(board.at(stoneToAddPosition].getGroup(), board.at(groupNode].getGroup()));
 		//calculate the new liberties of the group
-		board[groupNode].setLiberties(mergeLiberties(board[stoneToAddPosition].getLiberties(), board[groupNode].getLiberties(), board[groupNode].getGroup()));
+		board.at(groupNode].setLiberties(mergeLiberties(board.at(stoneToAddPosition].getLiberties(), board.at(groupNode].getLiberties(), board.at(groupNode].getGroup()));
 	}
 	//if it has already been added to a group, but it's the same group as we are testing now, then we don't need to do anything
 	//
 	//if it has already been added to a group, and the two groups are distinct, we need to merge the two groups
-	else if ((board[stoneToAddPosition].getWhichGroup() != board[stoneToAddPosition].getPosition()) && (board[stoneToAddPosition].getWhichGroup() != groupNode))
+	else if ((board.at(stoneToAddPosition].getWhichGroup() != board.at(stoneToAddPosition].getPosition()) && (board.at(stoneToAddPosition].getWhichGroup() != groupNode))
 	{
-		/*
-		Stones stoneWithGroupToAdd = board[stoneToAddPosition];
+		position_t newNodeStonePosition{ (biggerGroup(board, board.at(stoneToAddPosition], board.at(groupNode])[0]).getPosition() };
+		position_t oldNodeStonePosition{ (biggerGroup(board, board.at(stoneToAddPosition], board.at(groupNode])[1]).getPosition() };
+
+		//point all the stones that used to point to the old node to the new node
+		for (auto positionsOfGroupStones : board.at(oldNodeStonePosition].getGroup())
+			board.at(positionsOfGroupStones].setWhichGroup(board.at(newNodeStonePosition].getPosition());
+
+		//set the new group of the new node to the merged group
+		board.at(newNodeStonePosition].setGroup(mergeGroups(board.at(newNodeStonePosition].getGroup(), board.at(oldNodeStonePosition].getGroup()));
+		//empty the group of the old node
+		board.at(oldNodeStonePosition].setGroup(emptyGroup);
+
+		//set the new liberties of the new node to the merged liberties
+		board.at(newNodeStonePosition].setLiberties(mergeLiberties(board.at(newNodeStonePosition].getLiberties(), board.at(oldNodeStonePosition].getLiberties(), board.at(newNodeStonePosition].getGroup()));
+		//empty the liberties of the old node
+		board.at(oldNodeStonePosition].setLiberties(emptyGroup);
+	}
+}
+*/
+
+void addToGroup(board_t& board, position_t stoneToAddPosition, position_t groupMember)
+{
+
+	position_t nodeStonePosition{ board.at(groupMember).getWhichGroup() };
+	Stones &nodeStone{ board.at(nodeStonePosition) };
+	Stones &stoneToAdd{ board.at(stoneToAddPosition) };
+
+	//if it is a single stone, point it to the group node and add it to the group
+	if (stoneToAdd.getWhichGroup() == stoneToAddPosition)
+	{
+		//set the group indicator of the new stone to the group indicator of the group it's joining
+		stoneToAdd.setWhichGroup(nodeStonePosition);
+		//add the stone to the group vector
+		nodeStone.setGroup(mergeGroups(stoneToAdd.getGroup(), nodeStone.getGroup()));
+		//calculate the new liberties of the group
+		nodeStone.setLiberties(mergeLiberties(stoneToAdd.getLiberties(), nodeStone.getLiberties(), nodeStone.getGroup()));
+	}
+	//if it has already been added to a group, but it's the same group as we are testing now, then we don't need to do anything
+	//
+	//if it has already been added to a group, and the two groups are distinct, we need to merge the two groups
+	else if ((stoneToAdd.getWhichGroup() != stoneToAddPosition) && (stoneToAdd.getWhichGroup() != nodeStonePosition))
+	{
+		
+		Stones &stoneWithGroupToAdd{ stoneToAdd };
 		//find which is the larger group, and make the bigger one the node of the new group
 		//this might be unnecessary, as I don't think it affects how long it takes to do this, but we'll keep it in for now
-		Stones newNodeStone{ biggerGroup(board, board[stoneToAddPosition], board[groupNode])[0] };
-		Stones oldNodeStone{ biggerGroup(board, board[stoneToAddPosition], board[groupNode])[1] };
+		Stones &newNodeStone{ biggerGroup(board, stoneWithGroupToAdd, nodeStone)[0] };
+		Stones &oldNodeStone{ biggerGroup(board, stoneWithGroupToAdd, nodeStone)[1] };
 
 		//point all the stones that used to point to the old node to the new node
 		for (auto positionsOfGroupStones : oldNodeStone.getGroup())
-			board[positionsOfGroupStones].setWhichGroup(newNodeStone.getPosition());
+			board.at(positionsOfGroupStones).setWhichGroup(newNodeStone.getPosition());
 
 		//set the new group of the new node to the merged group
 		newNodeStone.setGroup(mergeGroups(newNodeStone.getGroup(), oldNodeStone.getGroup()));
 		//empty the group of the old node
-		oldNodeStone.setGroup(emptyGroup);
+		oldNodeStone.setGroup(constants::emptyGroup);
 
 		//set the new liberties of the new node to the merged liberties
 		newNodeStone.setLiberties(mergeLiberties(newNodeStone.getLiberties(), oldNodeStone.getLiberties(), newNodeStone.getGroup()));
 		//empty the liberties of the old node
-		oldNodeStone.setLiberties(emptyGroup);
-		*/
-
-
-
-		position_t newNodeStonePosition{ (biggerGroup(board, board[stoneToAddPosition], board[groupNode])[0]).getPosition() };
-		position_t oldNodeStonePosition{ (biggerGroup(board, board[stoneToAddPosition], board[groupNode])[1]).getPosition() };
-
-		//point all the stones that used to point to the old node to the new node
-		for (auto positionsOfGroupStones : board[oldNodeStonePosition].getGroup())
-			board[positionsOfGroupStones].setWhichGroup(board[newNodeStonePosition].getPosition());
-
-		//set the new group of the new node to the merged group
-		board[newNodeStonePosition].setGroup(mergeGroups(board[newNodeStonePosition].getGroup(), board[oldNodeStonePosition].getGroup()));
-		//empty the group of the old node
-		board[oldNodeStonePosition].setGroup(emptyGroup);
-
-		//set the new liberties of the new node to the merged liberties
-		board[newNodeStonePosition].setLiberties(mergeLiberties(board[newNodeStonePosition].getLiberties(), board[oldNodeStonePosition].getLiberties(), board[newNodeStonePosition].getGroup()));
-		//empty the liberties of the old node
-		board[oldNodeStonePosition].setLiberties(emptyGroup);
+		oldNodeStone.setLiberties(constants::emptyGroup);
 	}
 }
 
-void hasBeenTaken(board_t& board, position_t position, StoneColour stoneColour)
+//check whether stone at risk is surrounded by the opposite colour
+bool hasEmptyLiberties(board_t& board, Stones& nodeStone, StoneColour stoneColour)
 {
-	//check whether board[position] is surrounded by the opposite colour
-	bool emptyLiberty{ false };
-	Stones stoneAtRisk{ board[position] };
-
-	//for a single stone - single stones now point to themselves, so this doesn't do what I want
-	if (stoneAtRisk.getWhichGroup() == noPosition)
+	for (auto libertyPosition : nodeStone.getLiberties())
 	{
-		neighbour_t neighbours{ neighbourPositions(position) };
-		for (auto neighbour : neighbours)
+		//if there's a liberty which is not filled with the opposite colour, return true
+		if (board.at(libertyPosition).getColour() != switchColour(stoneColour))
 		{
-			if (neighbour != noPosition)
-			{
-				if (board[neighbour].getColour() != switchColour(stoneColour))
-				{
-					emptyLiberty = true;
-				}
-			}
+			return true;
 		}
-
-		//if the stone is surrounded, remove it and give the other colour a point
-		if (!emptyLiberty)
-		{
-			board[position].setEmptyStone();
-			changeScore(switchColour(stoneColour), 1);
-		}
-
 	}
-	else
+
+	//if all of a stone or group's liberties are full of the opposite colour, return that it does not have empty liberties
+	return false;
+}
+
+//checks whether a stone has been taken, based on whether its liberties are full
+void hasBeenTaken(board_t& board, position_t stoneAtRiskPosition, StoneColour stoneColour)
+{
+	Stones &stoneAtRisk{ board.at(stoneAtRiskPosition) };
+	
+	//for a single stone nodeStone is stoneAtRisk
+	Stones &nodeStone{ board.at(stoneAtRisk.getWhichGroup()) };
+
+	//if the stones is surrounded, remove them and give the other colour a point for each stone removed
+	if (!hasEmptyLiberties(board, nodeStone, stoneColour))
 	{
-		Stones nodeStone = board[stoneAtRisk.getWhichGroup()];
-		group_t groupPositions = nodeStone.getGroup();
-
-		//std::cerr << "pass\n\n";
-
-		for (auto libertyPosition : nodeStone.getLiberties())
+		//change score of the opposite colour by the size of the group taken
+		changeScore(switchColour(stoneColour), nodeStone.getGroup().size());
+		for (auto stonePosition : nodeStone.getGroup())
 		{
-			//std::cerr << nodeStone.getLiberties() << "\n";
-			//std::cerr << stoneColourToSymbol(board[libertyPosition].getColour()) << "\n";
-			//std::cerr << stoneColourToSymbol(switchColour(stoneColour)) << "\n";
-			if (board[libertyPosition].getColour() != switchColour(stoneColour))
-			{
-				emptyLiberty = true;
-			}
+			board.at(stonePosition).setEmptyStone(board, stonePosition);
 		}
 
-		//if the stones is surrounded, remove them and give the other colour a point for each stone removed
-		if (!emptyLiberty)
-		{
-			changeScore(switchColour(stoneColour), groupPositions.size());
-			for (auto stonePosition : groupPositions)
-			{
-				board[stonePosition].setEmptyStone();
-			}
-			
-		}
 	}
 }
 
-void placeMove(board_t& board, StoneColour turnColour, position_t position)
+void placeMove(board_t& board, StoneColour turnColour, position_t stonePosition)
 {
 	//places the stone
-	board[position].placeStone(position, turnColour);
+	Stones &stone{ board.at(stonePosition) };
+	stone.placeStone(stonePosition, turnColour);
 
 	//finds stone neighbours
-	neighbour_t neighbours{ neighbourPositions(position) };
+	neighbour_t neighbours{ neighbourPositions(stonePosition) };
 
 	//checks if any of the neighbours have been taken, or if they're the same colour it adds it to the stone group
 	for (int neighbour : neighbours)
 	{
-		if (neighbour != noPosition)//this is no longer necessary, as I remove the -1s in neighbourPositions
+		if (board.at(neighbour).getColour() == turnColour)
 		{
-			if (board[neighbour].getColour() == turnColour)
-			{
-				addToGroup(board, position, neighbour);
-			}
-			else if (board[neighbour].getColour() == switchColour(turnColour))
-			{
-				hasBeenTaken(board, neighbour, switchColour(turnColour));
-			}
+			addToGroup(board, stonePosition, neighbour);
+		}
+		else if (board.at(neighbour).getColour() == switchColour(turnColour))
+		{
+			hasBeenTaken(board, neighbour, switchColour(turnColour));
 		}
 	}
 
-	//if the move is suicidal we can reset the position to empty and ask for another move
+	//if the move is suicidal we can reset the position to empty and ask for another move to place - wrong
+	if (!hasEmptyLiberties(board, stone, turnColour))
+	{
+		stone.setEmptyStone(board, stonePosition);
+		placeMove(board, turnColour, askForAnotherMove(board));
+	}
+
 }

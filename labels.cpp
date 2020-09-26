@@ -4,13 +4,13 @@
 //Turns empty, black or white into the corresponding symbol for display on the board
 char stoneColourToSymbol(StoneColour stone)
 {
-	return stoneColourSymbol[static_cast<int>(stone)];
+	return constants::stoneColourSymbol[static_cast<int>(stone)];
 }
 
 //traditional Go boards index upwards
 int boardLabelReverse(int i)
 {
-		return boardSize - i;
+		return constants::boardSize - i;
 }
 
 StoneColour symbolToColour(char symbol)
@@ -101,7 +101,7 @@ void removeInvalidPositionsSorted(neighbour_t& neighbours)//removes -1s from a s
 	position_t missingPosition{};
 	for (int i{ 0 }; i < static_cast<int>(neighbours.size()); i++)
 	{
-		if ((neighbours[i] == noPosition) && (!isMissingNeighbour))
+		if ((neighbours[i] == constants::noPosition) && (!isMissingNeighbour))
 		{
 			isMissingNeighbour = 1;
 			missingPosition = i;
@@ -129,20 +129,20 @@ void removeInvalidPositions(neighbour_t& neighbours)//sorts unsorted vector and 
 //takes a row and column value and picks out the correct element of the 1D array
 int boardIndex(int row, int column)
 {
-	return (row * boardSize) + column;
+	return (row * constants::boardSize) + column;
 }
 
 //Converts a letter input from a move to a number on the grid
 int letterToColumnNumber(char letter)
 {
 	//A should convert to 1 and so on
-	int letterCast{ static_cast<int>(letter) - asciiOffset };
+	int letterCast{ static_cast<int>(letter) - constants::asciiOffset };
 	//checks if letter was between 'A' and 'H', as traditional Go Boards do not have a letter 'I' on them
-	if ((letterCast > boardSize + 1) || (letterCast < 1))
+	if ((letterCast > constants::boardSize + 1) || (letterCast < 1))
 	{
 		//std::cout << "Your letter converted to the number " << letterCast << "\n";
 		//std::cout << "Your column is out of range\n\n";
-		return ERROR;
+		return constants::ERROR;
 	}
 	//9 is the corresponding value for 'I'
 	else if (letterCast < 9)
@@ -156,7 +156,7 @@ int letterToColumnNumber(char letter)
 
 int numberCharactersToInteger(char numberCharacter)
 {
-	return (static_cast<int>(numberCharacter) - asciiOffsetNum);
+	return (static_cast<int>(numberCharacter) - constants::asciiOffsetNum);
 }
 
 int numberCharactersToInteger(std::string numberString)//my own implementation of stoi(), in case I don't want to use stoi()
@@ -178,9 +178,9 @@ int numberCharactersToInteger(std::string numberString)//my own implementation o
 	{
 		if (!isValidDigit(numberArray.at(i)))
 		{
-			return ERROR;
+			return constants::ERROR;
 		}
-		number += numberArray.at(i) * (static_cast<int>(pow(10, (numberOfDigits - i) - zeroOffset)));
+		number += numberArray.at(i) * (static_cast<int>(pow(10, (numberOfDigits - i) - constants::zeroOffset)));
 	}
 
 	return number;
@@ -208,7 +208,7 @@ bool isValidDigit(int digit)
 bool isValidIndex(int index)
 {
 	//current implementation converts letters to between 0 and 24, hence the limit on indices
-	if ((index < 0) || (index > std::min(24, boardSize)))
+	if ((index < 0) || (index > std::min(24, constants::boardSize)))
 		return false;
 	else
 		return true;
@@ -216,9 +216,9 @@ bool isValidIndex(int index)
 
 bool isValidLetter(char letter)
 {
-	int letterInteger{ (letterToColumnNumber(letter) - zeroOffset) };
+	int letterInteger{ (letterToColumnNumber(letter) - constants::zeroOffset) };
 	//if letterInteger is not a valid value, throw an error (A to Z without I converts to 0 to 24), but we don't want it bigger than the board
-	if ((letterInteger < 0) || (letterInteger > std::min(24, boardSize)))
+	if ((letterInteger < 0) || (letterInteger > std::min(24, constants::boardSize)))
 		return false;
 	else
 		return true;

@@ -17,9 +17,9 @@ void playerTurn(board_t &board, StoneColour &turnColour)
 		std::cout << printColour(static_cast<StoneColourCaps>(turnColour));
 		std::cout << "'s turn\n";
 		position_t position{ getMove(board) };
-		if (position == endGameFlag)
-			gameover(endGameFlag);
-		else if (position == flag)
+		if (position == constants::endGameFlag)
+			gameover(constants::endGameFlag);
+		else if (position == constants::passFlag)
 			;
 		else
 			placeMove(board, turnColour, position);
@@ -41,7 +41,7 @@ int gameover(int isEndGame)
 	return endGame;
 }
 
-void gameplay(board_t &board, std::array<char, boardSize>& letters)
+void gameplay(board_t &board, std::array<char, constants::boardSize>& letters)
 {
 	StoneColour turn{ StoneColour::black };
 	while (!gameover(0))
@@ -54,8 +54,9 @@ void gameplay(board_t &board, std::array<char, boardSize>& letters)
 
 int main()
 {
-	board_t board{ initialiseGame() };
-	std::array<char, boardSize> letters{ initialiseLetterArray() };
+	board_t board{};
+	initialiseGame(board);
+	std::array<char, constants::boardSize> letters{ initialiseLetterArray() };
 	gameplay(board, letters);
 
 	finalScore(board, letters);

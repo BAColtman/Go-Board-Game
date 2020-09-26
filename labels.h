@@ -20,17 +20,11 @@ int boardLabelReverse(int i);
 //takes a row and column value and picks out the correct element of the 1D array
 position_t boardIndex(int row, int column);
 
-// use an alias for the board type, can replace with a class later if I want
-using board_t = std::array<Stones, pointNumber>;
-board_t initialiseGame();
-
 int letterToColumnNumber(char letter);
 
 std::string printColour(StoneColour stone);
 
 std::string printColour(StoneColourCaps stone);
-
-std::array<char, boardSize> initialiseLetterArray();
 
 void sortVectorDescending(neighbour_t& neighbours);
 
