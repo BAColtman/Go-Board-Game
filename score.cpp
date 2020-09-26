@@ -18,7 +18,7 @@ score_t getScore(StoneColour turnColour)
 		return whiteScore;
 	}
 	else
-		return ERROR;
+		return constants::ERROR;
 }
 
 void changeScore(StoneColour turnColour, int change)

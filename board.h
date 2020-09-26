@@ -10,16 +10,15 @@
 
 void displayBoard(board_t& board, lettersArray_t& letters);
 
+void initialiseBoard(board_t& board);
 
 neighbour_t neighbourPositions(position_t position);
 
 position_t getMove(board_t& board);
 
-void addToGroup();
-
 void hasBeenTaken(board_t& board, position_t position, StoneColour stoneColour);
 
-void placeMove(board_t& board, StoneColour turnColour, position_t position);
+void placeMove(board_t& board, StoneColour turnColour, position_t stonePosition);
 
 void addToGroup(board_t& board, position_t stoneToAddPosition, position_t groupMember);
 
