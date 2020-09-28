@@ -5,32 +5,62 @@
 #include "stones.h"
 #include "labels.h"
 #include "score.h"
-#include <string>
 
 
-void displayBoard(board_t& board, lettersArray_t& letters);
 
-void initialiseBoard(board_t& board);
 
-neighbour_t neighbourPositions(position_t position);
+class Board
+{
+public:
+	//using board_t = std::array<const Stones, constants::pointNumber>;
+	std::array<Stones, constants::pointNumber> m_board;
 
-position_t getMove(board_t& board);
+private:
+	friend class Stones;
+	//board_t m_board;
+	//std::array<const Stones, constants::pointNumber> m_board;
+	//std::array<Stones, constants::pointNumber> m_board;
+	//std::array<std::reference_wrapper<Stones>, constants::pointNumber> m_board;
+	lettersArray_t m_letters;
 
-void hasBeenTaken(board_t& board, position_t position, StoneColour stoneColour);
 
-void placeMove(board_t& board, StoneColour turnColour, position_t stonePosition);
 
-void addToGroup(board_t& board, position_t stoneToAddPosition, position_t groupMember);
+public:
+	Board()
+	{
+		m_letters = initialiseLetterArray();
+	}
 
-group_t mergeGroups(group_t group1, group_t group2);
+	//Stones getStone(position_t position) { return (m_board.at(position)); }
+	//Stones& getStone(position_t position) { return (*this).m_board.at(position)); }
 
-void removeInvalidPositions(neighbour_t &neighbours);
+	void displayBoard();
 
-void removeInvalidPositionsSorted(neighbour_t &neighbours);
+	position_t getMove();
 
-void sortVectorDescending(neighbour_t& neighbours);
+	void hasBeenTaken(position_t position, StoneColour stoneColour);
 
-position_t moveInputToPosition(board_t& board, std::string move);
+	void placeMove(StoneColour turnColour, position_t stonePosition);
+
+	void addToGroup(position_t stoneToAddPosition, position_t groupMember);
+
+	group_t mergeGroups(group_t group1, group_t group2);
+
+	group_t mergeLiberties(group_t lib1, group_t lib2, group_t stoneGroup);
+
+	position_t askForAnotherMove();
+
+	bool hasEmptyLiberties(Stones& nodeStone, StoneColour stoneColour);
+
+	std::array<Stones, 2> biggerGroup(Stones stoneWithGroupToAdd, Stones nodeStone);
+
+	position_t moveInputToPosition(std::string move);
+
+};
+
+
+
+
 
 
 #endif // !BOARD_H

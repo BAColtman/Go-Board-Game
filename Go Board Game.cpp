@@ -6,23 +6,26 @@
 #include "board.h"
 #include "score.h"
 
+//Initialise the position generator to 0 for the board to iterate through it when it calls the stones constructor
+position_t Stones::s_positionGenerator = 0;
+
 int gameover(int isEndGame);
 
 //handles everything to do with each player's turn
-void playerTurn(board_t &board, StoneColour &turnColour)
+void playerTurn(Board &board, StoneColour &turnColour)
 {
 
 	if ((turnColour == StoneColour::black) || (turnColour == StoneColour::white))
 	{
 		std::cout << printColour(static_cast<StoneColourCaps>(turnColour));
 		std::cout << "'s turn\n";
-		position_t position{ getMove(board) };
+		position_t position{ board.getMove() };
 		if (position == constants::endGameFlag)
 			gameover(constants::endGameFlag);
 		else if (position == constants::passFlag)
 			;
 		else
-			placeMove(board, turnColour, position);
+			board.placeMove(turnColour, position);
 
 		turnColour = switchColour(turnColour);
 	}
@@ -41,12 +44,12 @@ int gameover(int isEndGame)
 	return endGame;
 }
 
-void gameplay(board_t &board, std::array<char, constants::boardSize>& letters)
+void gameplay(Board &board)
 {
 	StoneColour turn{ StoneColour::black };
 	while (!gameover(0))
 	{
-		displayBoard(board, letters);
+		board.displayBoard();
 		playerTurn(board, turn);
 		score();
 	}
@@ -54,12 +57,12 @@ void gameplay(board_t &board, std::array<char, constants::boardSize>& letters)
 
 int main()
 {
-	board_t board{};
-	initialiseGame(board);
-	std::array<char, constants::boardSize> letters{ initialiseLetterArray() };
-	gameplay(board, letters);
+	Board board{};
+	initialiseGame();
+	lettersArray_t letters{ initialiseLetterArray() };
+	gameplay(board);
 
-	finalScore(board, letters);
+	finalScore(board);
 
 	return 0;
 }

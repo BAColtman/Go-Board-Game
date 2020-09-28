@@ -91,7 +91,7 @@ std::string printColour(StoneColourCaps stone)
 
 void sortVectorDescending(neighbour_t& neighbours)
 {
-	sort(neighbours.begin(), neighbours.end(), std::greater<int>());//this should become qsort
+	sort(neighbours.begin(), neighbours.end(), std::greater{});
 }
 
 
