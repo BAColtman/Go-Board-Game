@@ -2,12 +2,12 @@
 #include "board.h"
 
 //Initialises the empty starting board
-void initialiseGame(board_t &board)
+void initialiseGame()
 {
 	std::cout << "\t\tGO BOARD GAME\t\t\n\n";
 	//std::cout << "\t     Black goes first\t\t\n\n";
 
-	initialiseBoard(board);
+	//initialiseBoard(board);
 }
 
 std::array<char, constants::boardSize> initialiseLetterArray()

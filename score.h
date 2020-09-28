@@ -3,6 +3,7 @@
 
 #include "setup.h"
 #include "labels.h"
+#include "board.h"
 
 
 using score_t = int;
@@ -13,8 +14,6 @@ void changeScore(StoneColour turnColour, int change);
 
 void score();
 
-void finalScore(board_t &board, lettersArray_t letters);
-
-void displayBoard(board_t& board, lettersArray_t& letters);
+void finalScore(Board& board);
 
 #endif // !SCORE_H

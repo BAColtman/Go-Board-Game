@@ -41,7 +41,7 @@ void score()
 	std::cout << "Score: " << getScore(StoneColour::black) << " Black, " << (static_cast<double>(getScore(StoneColour::white)) + komi) << " White\n\n";
 }
 
-void finalScore(board_t &board, lettersArray_t letters)
+void finalScore(Board &board)
 {
 	std::cout << "\n\n\n\n\n\n\nEnd of the game\n";
 	std::cout << "\nPlease input black's points from territory\n\n";
@@ -58,5 +58,5 @@ void finalScore(board_t &board, lettersArray_t letters)
 	std::cout << "\n\n\t\t\tFINAL SCORE\t\t\t\n\n";
 	score();
 
-	displayBoard(board, letters);
+	board.displayBoard();
 }

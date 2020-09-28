@@ -15,8 +15,6 @@ char stoneColourToSymbol(StoneColour stone);
 
 int boardLabelReverse(int i);
 
-//std::array<char, boardSize> initialiseLetterArray();
-
 //takes a row and column value and picks out the correct element of the 1D array
 position_t boardIndex(int row, int column);
 
@@ -43,5 +41,11 @@ bool isValidLetter(char letter);
 bool isValidLetter(int letterInteger);
 
 bool isValidDigit(int digit);
+
+void removeInvalidPositions(neighbour_t& neighbours);
+
+void removeInvalidPositionsSorted(neighbour_t& neighbours);
+
+void sortVectorDescending(neighbour_t& neighbours);
 
 #endif // !LABELS_H

@@ -6,8 +6,7 @@
 #include <vector>
 #include <string>
 
-
-//put all constants into a constant:: namespace
+//use const references if the function doesn't need to modify the input
 
 namespace constants
 {
@@ -34,10 +33,10 @@ namespace constants
 
 
 	//tools for debugging, 0 for no debug, 1 for debug mode
-	constexpr int isDebug{ 0 };
+	constexpr int isDebug{ 1 };
 
-	//std::vector<std::string> defaultInput{ {"A9", "A8", "B9", "B8", "F2", "C9"} };
-	const std::array<std::string, 8> defaultInput{ {"F7", "A8", "F8", "A6", "G7", "C9", "G8", "G6"} };
+	const std::array<std::string, 17> defaultInput{ {"A9", "A8", "B9", "B8", "D8", "C9", "A9", "pass", "D9", "pass", "C7", "pass", "B7", "pass","B9", "C8", "A7"} };
+	//const std::array<std::string, 8> defaultInput{ {"F7", "A8", "F8", "A6", "G7", "C9", "G8", "G6"} };
 
 }
 
@@ -91,7 +90,7 @@ enum class StoneColourCaps
 
 
 
-void initialiseGame(board_t& board);
+void initialiseGame();
 
 std::array<char, constants::boardSize> initialiseLetterArray();
 
