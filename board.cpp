@@ -15,22 +15,33 @@ void Board::displayBoard()
 	//more formatting to get the board to line up
 	if (constants::boardSize < 10)
 		std::cout << " ";
-	std::cout << boardLabelReverse(0) << " ";
+	std::cout << m_inputValidator.boardLabelReverse(0) << " ";
 	for (int i{ 1 }; i <= constants::pointNumber; i++)
 	{
 		//prints the current contents of each point
-		std::cout << stoneColourToSymbol(m_board.at(i - constants::zeroOffset).getColour()) << ' ';
+		std::cout << m_output.stoneColourToSymbol(m_board.at(i - constants::zeroOffset).getColour()) << ' ';
 		//makes a newline at the end of each row, and then prints the next label (apart from the last row)
 		if ((i % constants::boardSize == 0) && (i != constants::pointNumber))
 		{
 			std::cout << "\n";
 			//need an extra space for <10 to make the formatting nice
-			if (boardLabelReverse(i / constants::boardSize) < 10)
+			if (m_inputValidator.boardLabelReverse(i / constants::boardSize) < 10)
 				std::cout << " ";
-			std::cout << boardLabelReverse(i / constants::boardSize) << " ";
+			std::cout << m_inputValidator.boardLabelReverse(i / constants::boardSize) << " ";
 		}
 	}
 	std::cout << "\n\n";
+}
+
+//sets the entry of a stone on the board to reflect that a stone is not there
+void Board::setPointToEmptyStone(position_t stonePosition)
+{
+	Stones &stone = m_board.at(stonePosition);
+	stone.setColour(Stones::StoneColour::empty);
+	stone.setWhichGroup(constants::noPosition);
+	stone.setGroup(constants::emptyGroup);
+	//resetLiberties(board, position);
+	stone.resetLiberties();
 }
 
 //tells us that the input is invalid and asks for another move
@@ -42,20 +53,21 @@ position_t Board::askForAnotherMove()
 
 position_t Board::moveInputToPosition(std::string move)
 {
-		int columnIndex{ letterToColumnNumber(move.at(0)) - constants::zeroOffset };
-		int rowIndex{ boardLabelReverse(numberCharactersToInteger(move)) };
+		int columnIndex{ m_inputValidator.letterToColumnNumber(move.at(0)) - constants::zeroOffset };
+		int rowIndex{ m_inputValidator.boardLabelReverse(m_inputValidator.numberCharactersToInteger(move)) };
 
 
 		//returns the coordinates of where the stone should be placed, with the row entry reversed appropriately
-		position_t position{ boardIndex(rowIndex, columnIndex) };
+		position_t position{ m_inputValidator.boardIndex(rowIndex, columnIndex) };
 
 		//check if input is within bounds, before trying to access it
-		if ((position >= constants::pointNumber) || (!isValidLetter(columnIndex)) || (!isValidLetter(rowIndex)) || (rowIndex == constants::ERROR))
+		if ((position >= constants::pointNumber) || (!m_inputValidator.isValidLetter(columnIndex))
+			|| (!m_inputValidator.isValidLetter(rowIndex)) || (rowIndex == constants::ERROR))
 		{
 			return askForAnotherMove();
 		}
 		//check whether there's a stone already there
-		else if (m_board.at(position).getColour() != StoneColour::empty)
+		else if (m_board.at(position).getColour() != Stones::StoneColour::empty)
 		{
 			return askForAnotherMove();
 		}
@@ -109,7 +121,7 @@ group_t Board::mergeGroups(group_t group1, group_t group2)
 	mergedGroup.insert(mergedGroup.end(), group1.begin(), group1.end());
 	mergedGroup.insert(mergedGroup.end(), group2.begin(), group2.end());
 
-	sortVectorDescending(mergedGroup);
+	m_inputValidator.sortVectorDescending(mergedGroup);
 	//remove duplicates
 	groupElement_t lastElement{ constants::noPosition };
 	for (auto &currentElement : mergedGroup)
@@ -123,7 +135,7 @@ group_t Board::mergeGroups(group_t group1, group_t group2)
 			lastElement = currentElement;
 		}
 	}
-	removeInvalidPositions(mergedGroup);
+	m_inputValidator.removeInvalidPositions(mergedGroup);
 
 	return mergedGroup;
 }
@@ -143,7 +155,7 @@ group_t Board::mergeLiberties(group_t lib1, group_t lib2, group_t stoneGroup)
 		}
 	}
 
-	removeInvalidPositions(libertyGroup);
+	m_inputValidator.removeInvalidPositions(libertyGroup);
 
 	return libertyGroup;
 }
@@ -207,13 +219,33 @@ void Board::addToGroup(position_t stoneToAddPosition, position_t groupMember)
 	}
 }
 
-//check whether stone at risk is surrounded by the opposite colour
-bool Board::hasEmptyLiberties(Stones& nodeStone, StoneColour stoneColour)
+//Removes a stone from the group it's currently in - we use this if we need to reverse a suicide move
+void Board::removePointFromGroup(position_t stonePosition)
+{
+	//need to find which group it's in and remove it from the group, reset it to be in its own group
+	Stones &nodeStone = m_board.at(m_board.at(stonePosition).getWhichGroup());
+	group_t group{ nodeStone.getGroup() };
+	for (int i{ 0 }; i < static_cast<int>(group.size()); i++)
+	{
+		position_t& position{ group.at(i) };
+		if (position == stonePosition)
+		{
+			position = constants::noPosition;
+			//break;
+		}
+	}
+
+	m_inputValidator.removeInvalidPositions(group);
+	nodeStone.setGroup(group);
+}
+
+//check whether stones at risk are surrounded by the opposite colour
+bool Board::hasEmptyLiberties(Stones& nodeStone, Stones::StoneColour stoneColour)
 {
 	for (auto libertyPosition : nodeStone.getLiberties())
 	{
 		//if there's a liberty which is not filled with the opposite colour, return true
-		if (m_board.at(libertyPosition).getColour() != switchColour(stoneColour))
+		if (m_board.at(libertyPosition).getColour() != m_inputValidator.switchColour(stoneColour))
 		{
 			return true;
 		}
@@ -224,7 +256,7 @@ bool Board::hasEmptyLiberties(Stones& nodeStone, StoneColour stoneColour)
 }
 
 //checks whether stones have been taken, based on whether their liberties are full
-void Board::hasBeenTaken(position_t stoneAtRiskPosition, StoneColour stoneColour)
+void Board::hasBeenTaken(position_t stoneAtRiskPosition, Stones::StoneColour stoneColour)
 {
 	Stones stoneAtRisk{ m_board.at(stoneAtRiskPosition) };
 	
@@ -236,16 +268,16 @@ void Board::hasBeenTaken(position_t stoneAtRiskPosition, StoneColour stoneColour
 	if (!hasEmptyLiberties(nodeStone, stoneColour))
 	{
 		//change score of the opposite colour by the size of the group taken
-		changeScore(switchColour(stoneColour), nodeStone.getGroup().size());
+		m_score.changeScore(m_inputValidator.switchColour(stoneColour), nodeStone.getGroup().size());
 		for (auto stonePosition : nodeStone.getGroup())
 		{
-			m_board.at(stonePosition).setEmptyStone(m_board, stonePosition);
+			setPointToEmptyStone(stonePosition);
 		}
 
 	}
 }
 
-void Board::placeMove(StoneColour turnColour, position_t stonePosition)
+void Board::placeMove(Stones::StoneColour turnColour, position_t stonePosition)
 {
 	//places the stone
 	Stones& stone{ m_board.at(stonePosition) };
@@ -261,18 +293,32 @@ void Board::placeMove(StoneColour turnColour, position_t stonePosition)
 		{
 			addToGroup(stonePosition, neighbour);
 		}
-		else if (m_board.at(neighbour).getColour() == switchColour(turnColour))
+		else if (m_board.at(neighbour).getColour() == m_inputValidator.switchColour(turnColour))
 		{
-			hasBeenTaken(neighbour, switchColour(turnColour));
+			hasBeenTaken(neighbour, m_inputValidator.switchColour(turnColour));
 		}
 	}
 
-	//if the move is suicidal we can reset the position to empty and ask for another move to place - wrong
-	if (!hasEmptyLiberties(stone, turnColour))
+	//if the move is suicidal we can reset the position to empty and ask for another move to place
+	if (!hasEmptyLiberties(m_board.at(stone.getWhichGroup()), turnColour))
 	{
-
-		stone.setEmptyStone(m_board, stonePosition);
+		removePointFromGroup(stonePosition);
+		setPointToEmptyStone(stonePosition);
 		placeMove(turnColour, askForAnotherMove());
 	}
 
+}
+
+lettersArray_t Board::initialiseLetterArray()
+{
+	lettersArray_t letterArray;
+	int offset{ constants::asciiOffset + constants::zeroOffset };
+	for (int i{ 0 }; i < constants::boardSize; i++)
+	{
+		letterArray.at(i) = static_cast<char>(i + offset);
+		//skips I, as on a traditional Go board
+		if (i == 7)
+			offset++;
+	}
+	return letterArray;
 }

@@ -4,18 +4,20 @@
 #include "stones.h"
 #include "board.h"
 
-//sets the entry of a stone on the board to reflect that a stone is not there
-void Stones::setEmptyStone(board_t& m_board, position_t position)
+//Stones class constructor
+Stones::Stones()
 {
-	setColour(StoneColour::empty);
-	setWhichGroup(constants::noPosition);
-	setGroup(constants::emptyGroup);
-	//resetLiberties(board, position);
-	m_board.at(position).setLiberties(findNeighbourPositions());
+	//these will all be set once I initialise the board
+	m_colour = Stones::StoneColour::empty;
+	m_pointToGroup = constants::noPosition;
+	//gets the next position from the position generator
+	m_position = s_positionGenerator++;
+	m_groupMembers = constants::emptyGroup;
+	m_groupLiberties = findNeighbourPositions();
 }
 
 //changes the entry of a stone on the board to reflect that it has been placed
-void Stones::placeStone(position_t position, StoneColour colour)
+void Stones::placeStone(position_t position, Stones::StoneColour colour)
 {
 	setColour(colour);
 	setWhichGroup(position);
@@ -23,9 +25,9 @@ void Stones::placeStone(position_t position, StoneColour colour)
 }
 
 
-void Stones::resetLiberties(board_t &m_board, position_t position)
+void Stones::resetLiberties()
 {
-	m_board.at(position).setLiberties(findNeighbourPositions());
+	setLiberties(findNeighbourPositions());
 }
 
 neighbour_t Stones::findNeighbourPositions()
@@ -59,7 +61,8 @@ neighbour_t Stones::findNeighbourPositions()
 		neighbours.at(3) = position - 1;
 	}
 
-	removeInvalidPositions(neighbours);
+	InputValidator inputValidator;
+	inputValidator.removeInvalidPositions(neighbours);
 
 	return neighbours;
 }

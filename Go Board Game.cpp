@@ -2,67 +2,26 @@
 
 #include "setup.h"
 #include "stones.h"
-#include "labels.h"
+#include "output.h"
+#include "scoreTracker.h"
 #include "board.h"
-#include "score.h"
+#include "game.h"
 
 //Initialise the position generator to 0 for the board to iterate through it when it calls the stones constructor
 position_t Stones::s_positionGenerator = 0;
 
-int gameover(int isEndGame);
 
-//handles everything to do with each player's turn
-void playerTurn(Board &board, StoneColour &turnColour)
-{
-
-	if ((turnColour == StoneColour::black) || (turnColour == StoneColour::white))
-	{
-		std::cout << printColour(static_cast<StoneColourCaps>(turnColour));
-		std::cout << "'s turn\n";
-		position_t position{ board.getMove() };
-		if (position == constants::endGameFlag)
-			gameover(constants::endGameFlag);
-		else if (position == constants::passFlag)
-			;
-		else
-			board.placeMove(turnColour, position);
-
-		turnColour = switchColour(turnColour);
-	}
-	else
-	{
-		std::cout << "Error, unexpected turn";
-	}
-	
-}
-
-int gameover(int isEndGame)
-{
-	//once isEndGame is !0, it will end the game
-	static int endGame{ 0 };
-	endGame += isEndGame;
-	return endGame;
-}
-
-void gameplay(Board &board)
-{
-	StoneColour turn{ StoneColour::black };
-	while (!gameover(0))
-	{
-		board.displayBoard();
-		playerTurn(board, turn);
-		score();
-	}
-}
 
 int main()
 {
-	Board board{};
-	initialiseGame();
-	lettersArray_t letters{ initialiseLetterArray() };
-	gameplay(board);
+	//Board board{};
+	Game game{};
+	game.initialiseGame();
+	game.gameplay();
 
-	finalScore(board);
+	game.getBoard().getScoreTracker().finalScore();
+	//Display board end state
+	game.getBoard().displayBoard();
 
 	return 0;
 }
