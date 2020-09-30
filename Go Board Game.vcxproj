@@ -147,17 +147,18 @@
   <ItemGroup>
     <ClCompile Include="Go Board Game.cpp" />
     <ClCompile Include="scoreTracker.cpp" />
-    <ClCompile Include="setup.cpp" />
     <ClCompile Include="board.cpp" />
     <ClCompile Include="output.cpp" />
     <ClCompile Include="game.cpp" />
-    <ClCompile Include="inputValidator.cpp" />
+    <ClCompile Include="input.cpp" />
     <ClCompile Include="stones.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="board.h" />
     <ClInclude Include="game.h" />
-    <ClInclude Include="inputValidator.h" />
+    <ClInclude Include="letterToNumber.h" />
+    <ClInclude Include="stoneColour.h" />
+    <ClInclude Include="input.h" />
     <ClInclude Include="output.h" />
     <ClInclude Include="setup.h" />
     <ClInclude Include="scoreTracker.h" />

@@ -2,7 +2,7 @@
 
 
 //Turns empty, black or white into the corresponding symbol for display on the board
-char Output::stoneColourToSymbol(Stones::StoneColour stone)
+char Output::stoneColourToSymbol(StoneColour stone)
 {
 	return constants::stoneColourSymbol[static_cast<int>(stone)];
 }
@@ -10,20 +10,20 @@ char Output::stoneColourToSymbol(Stones::StoneColour stone)
 
 
 /*
-Stones::StoneColour symbolToColour(char symbol)
+StoneColour symbolToColour(char symbol)
 {
-	Stones::StoneColour colour{};
+	StoneColour colour{};
 	if (symbol == '-')
 	{
-		colour = Stones::StoneColour::empty;
+		colour = StoneColour::empty;
 	}
 	else if (symbol == 'X')
 	{
-		colour = Stones::StoneColour::black;
+		colour = StoneColour::black;
 	}
 	else if (symbol == 'O')
 	{
-		colour = Stones::StoneColour::white;
+		colour = StoneColour::white;
 	}
 	else
 		std::cout << "error\n";
@@ -32,17 +32,17 @@ Stones::StoneColour symbolToColour(char symbol)
 }
 */
 
-std::string Output::printColour(Stones::StoneColour stone)
+std::string Output::printColour(StoneColour stone)
 {
-	if (stone == Stones::StoneColour::black)
+	if (stone == StoneColour::black)
 	{
 		return "black";
 	}
-	else if (stone == Stones::StoneColour::white)
+	else if (stone == StoneColour::white)
 	{
 		return "white";
 	}
-	else if (stone == Stones::StoneColour::empty)
+	else if (stone == StoneColour::empty)
 	{
 		return "empty";
 	}
@@ -50,17 +50,17 @@ std::string Output::printColour(Stones::StoneColour stone)
 		return "error";
 }
 
-std::string Output::printColour(Stones::StoneColourCaps stone)
+std::string Output::printColourCaps(StoneColour stone)
 {
-	if (stone == Stones::StoneColourCaps::Black)
+	if (stone == StoneColour::black)
 	{
 		return "Black";
 	}
-	else if (stone == Stones::StoneColourCaps::White)
+	else if (stone == StoneColour::white)
 	{
 		return "White";
 	}
-	else if (stone == Stones::StoneColourCaps::Empty)
+	else if (stone == StoneColour::empty)
 	{
 		return "Empty";
 	}

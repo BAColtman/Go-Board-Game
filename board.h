@@ -5,26 +5,18 @@
 #include "stones.h"
 #include "output.h"
 #include "scoreTracker.h"
-#include "inputValidator.h"
+#include "input.h"
 
 
+//using board_t = std::array<Stones, constants::pointNumber>;
 
 class Board
 {
-public:
-	//using board_t = std::array<const Stones, constants::pointNumber>;
-
 private:
 
-	board_t m_board;
-	//std::array<std::reference_wrapper<Stones>, constants::pointNumber> m_board;
+	std::array<Stones, constants::pointNumber> m_board;
 	lettersArray_t m_letters;
 	ScoreTracker m_score;
-	InputValidator m_inputValidator;
-	Output m_output;
-	
-
-
 
 public:
 	Board()
@@ -39,9 +31,9 @@ public:
 
 	position_t getMove();
 
-	void hasBeenTaken(position_t position, Stones::StoneColour stoneColour);
+	void hasBeenTaken(position_t position, StoneColour stoneColour);
 
-	void placeMove(Stones::StoneColour turnColour, position_t stonePosition);
+	bool placeMove(StoneColour turnColour, position_t stonePosition);
 
 	void addToGroup(position_t stoneToAddPosition, position_t groupMember);
 
@@ -49,19 +41,17 @@ public:
 
 	group_t mergeLiberties(group_t lib1, group_t lib2, group_t stoneGroup);
 
-	position_t askForAnotherMove();
-
-	bool hasEmptyLiberties(Stones& nodeStone, Stones::StoneColour stoneColour);
+	bool hasEmptyLiberties(Stones& nodeStone, StoneColour stoneColour);
 
 	std::array<Stones, 2> biggerGroup(Stones stoneWithGroupToAdd, Stones nodeStone);
 
-	position_t moveInputToPosition(std::string move);
+	position_t inputToPosition(std::string move);
 
 	lettersArray_t initialiseLetterArray();
 
 	lettersArray_t getLetters() { return m_letters; }
 
-	ScoreTracker& getScoreTracker()  { return m_score; }
+	ScoreTracker getScoreTracker()  { return m_score; }
 
 	void removePointFromGroup(position_t stonePosition);
 

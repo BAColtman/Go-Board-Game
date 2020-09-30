@@ -18,9 +18,6 @@
     <ClCompile Include="Go Board Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="setup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="board.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -33,10 +30,10 @@
     <ClCompile Include="scoreTracker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="inputValidator.cpp">
+    <ClCompile Include="output.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="output.cpp">
+    <ClCompile Include="input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,10 +53,16 @@
     <ClInclude Include="scoreTracker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inputValidator.h">
+    <ClInclude Include="output.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="output.h">
+    <ClInclude Include="stoneColour.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="letterToNumber.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
