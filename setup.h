@@ -6,7 +6,17 @@
 #include <vector>
 #include <string>
 
-//use const references if the function doesn't need to modify the input
+/* Still to do:
+ * use const references if the function doesn't need to modify the input
+ * implement depth search scoring
+ * variable board size
+ * 
+ * 
+ * 
+ * 
+*/
+
+
 
 namespace constants
 {
@@ -71,30 +81,6 @@ namespace constants
 	const std::array<char, 3> stoneColourSymbol{ { '-','X','O' } };
 
 }
-
-//enumerator to decide what, if anything, is on a particular space on the board
-enum class StoneColour
-{
-	empty,
-	black,
-	white
-};
-
-
-enum class StoneColourCaps
-{
-	Empty,
-	Black,
-	White
-};
-
-
-
-void initialiseGame();
-
-std::array<char, constants::boardSize> initialiseLetterArray();
-
-
 
 
 #endif // !SETUP_H

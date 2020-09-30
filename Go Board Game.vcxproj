@@ -146,17 +146,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Go Board Game.cpp" />
-    <ClCompile Include="score.cpp" />
+    <ClCompile Include="scoreTracker.cpp" />
     <ClCompile Include="setup.cpp" />
     <ClCompile Include="board.cpp" />
-    <ClCompile Include="labels.cpp" />
+    <ClCompile Include="output.cpp" />
+    <ClCompile Include="game.cpp" />
+    <ClCompile Include="inputValidator.cpp" />
     <ClCompile Include="stones.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="board.h" />
-    <ClInclude Include="labels.h" />
+    <ClInclude Include="game.h" />
+    <ClInclude Include="inputValidator.h" />
+    <ClInclude Include="output.h" />
     <ClInclude Include="setup.h" />
-    <ClInclude Include="score.h" />
+    <ClInclude Include="scoreTracker.h" />
     <ClInclude Include="stones.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
