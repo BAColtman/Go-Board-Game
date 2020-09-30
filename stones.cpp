@@ -8,7 +8,7 @@
 Stones::Stones()
 {
 	//these will all be set once I initialise the board
-	m_colour = Stones::StoneColour::empty;
+	m_colour = StoneColour::empty;
 	m_pointToGroup = constants::noPosition;
 	//gets the next position from the position generator
 	m_position = s_positionGenerator++;
@@ -17,7 +17,7 @@ Stones::Stones()
 }
 
 //changes the entry of a stone on the board to reflect that it has been placed
-void Stones::placeStone(position_t position, Stones::StoneColour colour)
+void Stones::placeStone(position_t position, StoneColour colour)
 {
 	setColour(colour);
 	setWhichGroup(position);
@@ -61,8 +61,7 @@ neighbour_t Stones::findNeighbourPositions()
 		neighbours.at(3) = position - 1;
 	}
 
-	InputValidator inputValidator;
-	inputValidator.removeInvalidPositions(neighbours);
+	Input::removeInvalidPositions(neighbours);
 
 	return neighbours;
 }

@@ -15,19 +15,19 @@ void Board::displayBoard()
 	//more formatting to get the board to line up
 	if (constants::boardSize < 10)
 		std::cout << " ";
-	std::cout << m_inputValidator.boardLabelReverse(0) << " ";
+	std::cout << Input::boardLabelReverse(0) << " ";
 	for (int i{ 1 }; i <= constants::pointNumber; i++)
 	{
 		//prints the current contents of each point
-		std::cout << m_output.stoneColourToSymbol(m_board.at(i - constants::zeroOffset).getColour()) << ' ';
+		std::cout << Output::stoneColourToSymbol(m_board.at(i - constants::zeroOffset).getColour()) << ' ';
 		//makes a newline at the end of each row, and then prints the next label (apart from the last row)
 		if ((i % constants::boardSize == 0) && (i != constants::pointNumber))
 		{
 			std::cout << "\n";
 			//need an extra space for <10 to make the formatting nice
-			if (m_inputValidator.boardLabelReverse(i / constants::boardSize) < 10)
+			if (Input::boardLabelReverse(i / constants::boardSize) < 10)
 				std::cout << " ";
-			std::cout << m_inputValidator.boardLabelReverse(i / constants::boardSize) << " ";
+			std::cout << Input::boardLabelReverse(i / constants::boardSize) << " ";
 		}
 	}
 	std::cout << "\n\n";
@@ -37,42 +37,56 @@ void Board::displayBoard()
 void Board::setPointToEmptyStone(position_t stonePosition)
 {
 	Stones &stone = m_board.at(stonePosition);
-	stone.setColour(Stones::StoneColour::empty);
+	stone.setColour(StoneColour::empty);
 	stone.setWhichGroup(constants::noPosition);
 	stone.setGroup(constants::emptyGroup);
-	//resetLiberties(board, position);
 	stone.resetLiberties();
 }
 
-//tells us that the input is invalid and asks for another move
-position_t Board::askForAnotherMove()
-{
-	std::cout << "Invalid move, pick another\n\n";
-	return getMove();
-}
 
-position_t Board::moveInputToPosition(std::string move)
+
+position_t Board::inputToPosition(std::string move)
 {
-		int columnIndex{ m_inputValidator.letterToColumnNumber(move.at(0)) - constants::zeroOffset };
-		int rowIndex{ m_inputValidator.boardLabelReverse(m_inputValidator.numberCharactersToInteger(move)) };
+
+	try
+	{
+		int columnIndex{ Input::letterToColumnNumber(move.at(0))};
+		int rowIndex{ Input::boardLabelReverse(Input::inputToRowNumber(move)) };
 
 
 		//returns the coordinates of where the stone should be placed, with the row entry reversed appropriately
-		position_t position{ m_inputValidator.boardIndex(rowIndex, columnIndex) };
+		position_t position{ Input::boardIndex(rowIndex, columnIndex) };
 
-		//check if input is within bounds, before trying to access it
-		if ((position >= constants::pointNumber) || (!m_inputValidator.isValidLetter(columnIndex))
-			|| (!m_inputValidator.isValidLetter(rowIndex)) || (rowIndex == constants::ERROR))
-		{
-			return askForAnotherMove();
-		}
 		//check whether there's a stone already there
-		else if (m_board.at(position).getColour() != Stones::StoneColour::empty)
+		//if position is invalid at() will throw an exception when we try to access it
+		if (m_board.at(position).getColour() != StoneColour::empty)
 		{
-			return askForAnotherMove();
+			throw "Can't place a stone on a filled space";
 		}
 		else
 			return position;
+	}
+	//All the different exceptions put out their own error code
+	catch (const char* exception)
+	{
+		std::cerr << exception << "\n";
+	}
+	catch (std::invalid_argument)
+	{
+		std::cout << "Invalid input\n";
+	}
+	catch (std::out_of_range)
+	{
+		std::cout << "Invalid board space\n";
+	}
+	catch (error_t)
+	{
+		std::cout << "Invalid move\n";
+	}
+	//regardless of what sort of exception is thrown, it will ask for another move afterwards
+	std::cout << "Please pick another move\n\n";
+	return getMove();
+	
 }
 
 position_t Board::getMove()
@@ -95,19 +109,13 @@ position_t Board::getMove()
 	std::cout << "\n";
 
 
-	if ((move == "pass") && (hasPass == 0))
+	if (move == "pass")
 	{
-		hasPass = 1;
-		return constants::flag;
-	}
-	else if ((move == "pass") && (hasPass == 1))
-	{
-		return constants::endGameFlag;
+		return constants::passFlag;
 	}
 	else
 	{
-		hasPass = 0;
-		return moveInputToPosition(move);
+		return inputToPosition(move);
 	}
 }
 
@@ -121,7 +129,7 @@ group_t Board::mergeGroups(group_t group1, group_t group2)
 	mergedGroup.insert(mergedGroup.end(), group1.begin(), group1.end());
 	mergedGroup.insert(mergedGroup.end(), group2.begin(), group2.end());
 
-	m_inputValidator.sortVectorDescending(mergedGroup);
+	Input::sortVectorDescending(mergedGroup);
 	//remove duplicates
 	groupElement_t lastElement{ constants::noPosition };
 	for (auto &currentElement : mergedGroup)
@@ -135,7 +143,7 @@ group_t Board::mergeGroups(group_t group1, group_t group2)
 			lastElement = currentElement;
 		}
 	}
-	m_inputValidator.removeInvalidPositions(mergedGroup);
+	Input::removeInvalidPositions(mergedGroup);
 
 	return mergedGroup;
 }
@@ -155,7 +163,7 @@ group_t Board::mergeLiberties(group_t lib1, group_t lib2, group_t stoneGroup)
 		}
 	}
 
-	m_inputValidator.removeInvalidPositions(libertyGroup);
+	Input::removeInvalidPositions(libertyGroup);
 
 	return libertyGroup;
 }
@@ -235,17 +243,17 @@ void Board::removePointFromGroup(position_t stonePosition)
 		}
 	}
 
-	m_inputValidator.removeInvalidPositions(group);
+	Input::removeInvalidPositions(group);
 	nodeStone.setGroup(group);
 }
 
 //check whether stones at risk are surrounded by the opposite colour
-bool Board::hasEmptyLiberties(Stones& nodeStone, Stones::StoneColour stoneColour)
+bool Board::hasEmptyLiberties(Stones& nodeStone, StoneColour stoneColour)
 {
 	for (auto libertyPosition : nodeStone.getLiberties())
 	{
 		//if there's a liberty which is not filled with the opposite colour, return true
-		if (m_board.at(libertyPosition).getColour() != m_inputValidator.switchColour(stoneColour))
+		if (m_board.at(libertyPosition).getColour() != Input::switchColour(stoneColour))
 		{
 			return true;
 		}
@@ -256,7 +264,7 @@ bool Board::hasEmptyLiberties(Stones& nodeStone, Stones::StoneColour stoneColour
 }
 
 //checks whether stones have been taken, based on whether their liberties are full
-void Board::hasBeenTaken(position_t stoneAtRiskPosition, Stones::StoneColour stoneColour)
+void Board::hasBeenTaken(position_t stoneAtRiskPosition, StoneColour stoneColour)
 {
 	Stones stoneAtRisk{ m_board.at(stoneAtRiskPosition) };
 	
@@ -268,7 +276,7 @@ void Board::hasBeenTaken(position_t stoneAtRiskPosition, Stones::StoneColour sto
 	if (!hasEmptyLiberties(nodeStone, stoneColour))
 	{
 		//change score of the opposite colour by the size of the group taken
-		m_score.changeScore(m_inputValidator.switchColour(stoneColour), nodeStone.getGroup().size());
+		m_score.changeScore(Input::switchColour(stoneColour), nodeStone.getGroup().size());
 		for (auto stonePosition : nodeStone.getGroup())
 		{
 			setPointToEmptyStone(stonePosition);
@@ -277,7 +285,8 @@ void Board::hasBeenTaken(position_t stoneAtRiskPosition, Stones::StoneColour sto
 	}
 }
 
-void Board::placeMove(Stones::StoneColour turnColour, position_t stonePosition)
+
+bool Board::placeMove(StoneColour turnColour, position_t stonePosition)
 {
 	//places the stone
 	Stones& stone{ m_board.at(stonePosition) };
@@ -293,9 +302,9 @@ void Board::placeMove(Stones::StoneColour turnColour, position_t stonePosition)
 		{
 			addToGroup(stonePosition, neighbour);
 		}
-		else if (m_board.at(neighbour).getColour() == m_inputValidator.switchColour(turnColour))
+		else if (m_board.at(neighbour).getColour() == Input::switchColour(turnColour))
 		{
-			hasBeenTaken(neighbour, m_inputValidator.switchColour(turnColour));
+			hasBeenTaken(neighbour, Input::switchColour(turnColour));
 		}
 	}
 
@@ -304,8 +313,11 @@ void Board::placeMove(Stones::StoneColour turnColour, position_t stonePosition)
 	{
 		removePointFromGroup(stonePosition);
 		setPointToEmptyStone(stonePosition);
-		placeMove(turnColour, askForAnotherMove());
+		std::cout << "Suicide moves are not valid\n";
+		return false;
 	}
+	else
+		return true;
 
 }
 

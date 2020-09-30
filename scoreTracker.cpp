@@ -2,13 +2,13 @@
 
 
 
-score_t ScoreTracker::getScore(Stones::StoneColour turnColour)
+score_t ScoreTracker::getScore(StoneColour turnColour)
 {
-	if (turnColour == Stones::StoneColour::black)
+	if (turnColour == StoneColour::black)
 	{
 		return m_blackScore;
 	}
-	else if (turnColour == Stones::StoneColour::white)
+	else if (turnColour == StoneColour::white)
 	{
 		return m_whiteScore;
 	}
@@ -16,14 +16,14 @@ score_t ScoreTracker::getScore(Stones::StoneColour turnColour)
 		return constants::ERROR;
 }
 
-void ScoreTracker::changeScore(Stones::StoneColour turnColour, int change)
+void ScoreTracker::changeScore(StoneColour turnColour, int change)
 {
 
-	if (turnColour == Stones::StoneColour::black)
+	if (turnColour == StoneColour::black)
 	{
 		m_blackScore += change;
 	}
-	else if (turnColour == Stones::StoneColour::white)
+	else if (turnColour == StoneColour::white)
 	{
 		m_whiteScore += change;
 	}
@@ -31,9 +31,9 @@ void ScoreTracker::changeScore(Stones::StoneColour turnColour, int change)
 
 void ScoreTracker::currentScore()
 {
-	std::cout << "Stones captured are " << getScore(Stones::StoneColour::black) << " for Black, " << getScore(Stones::StoneColour::white) << " for White\n\n";
+	std::cout << "Stones captured are " << getScore(StoneColour::black) << " for Black, " << getScore(StoneColour::white) << " for White\n\n";
 	std::cout << "White has komi of " << m_komi << "\n\n";
-	std::cout << "Score: " << getScore(Stones::StoneColour::black) << " Black, " << (static_cast<double>(getScore(Stones::StoneColour::white)) + m_komi) << " White\n\n";
+	std::cout << "Score: " << getScore(StoneColour::black) << " Black, " << (static_cast<double>(getScore(StoneColour::white)) + m_komi) << " White\n\n";
 }
 
 void ScoreTracker::finalScore()
@@ -42,10 +42,10 @@ void ScoreTracker::finalScore()
 	std::cout << "\nPlease input black's points from territory\n\n";
 	std::string scoreChange{};
 	std::getline(std::cin, scoreChange);
-	changeScore(Stones::StoneColour::black, stoi(scoreChange));
+	changeScore(StoneColour::black, stoi(scoreChange));
 	std::cout << "\nPlease input white's points from territory\n\n";
 	std::getline(std::cin, scoreChange);
-	changeScore(Stones::StoneColour::white, stoi(scoreChange));
+	changeScore(StoneColour::white, stoi(scoreChange));
 
 
 	std::cout << "\n\n\t\t\tFINAL SCORE\t\t\t\n\n";

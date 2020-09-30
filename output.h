@@ -14,17 +14,17 @@ private:
 
 public:
 
-	//Stones::StoneColour symbolToColour(char symbol);
+	//StoneColour symbolToColour(char symbol);
 
 
 
-	char stoneColourToSymbol(Stones::StoneColour stone);
+	static char stoneColourToSymbol(StoneColour stone);
 
 
 
-	std::string printColour(Stones::StoneColour stone);
+	static std::string printColour(StoneColour stone);
 
-	std::string printColour(Stones::StoneColourCaps stone);
+	static std::string printColourCaps(StoneColour stone);
 
 };
 

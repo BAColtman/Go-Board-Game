@@ -7,14 +7,35 @@
 #include "board.h"
 #include "game.h"
 
+
+
+/* Still to do:
+ * use const references if the function doesn't need to modify the input
+ * implement depth search scoring
+ * variable board size
+ * indexing by points -> indexing by rows & columns (9 row arrays of 9)
+ * evaluate the board when you place a stone rather than keeping track of all the groups stuff - do this last
+ *
+ * playerTurn should return an enum of valid move, invalid move and pass
+ * pass should be a bool of did last person pass, in game object
+ * 
+ *
+ * make the score object part of game maybe? Probably fine
+ * 
+ * invalid move: print invalid move and just don't switch turn - can't do this until I just evaluate the board state, as suicide stones currently get dealt with after I deal with the passes
+ *
+ */
+
+
+
+
+
 //Initialise the position generator to 0 for the board to iterate through it when it calls the stones constructor
 position_t Stones::s_positionGenerator = 0;
 
 
-
 int main()
 {
-	//Board board{};
 	Game game{};
 	game.initialiseGame();
 	game.gameplay();

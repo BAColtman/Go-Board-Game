@@ -5,18 +5,10 @@
 #include <array>
 #include <vector>
 #include <string>
+#include "stoneColour.h"
 
-/* Still to do:
- * use const references if the function doesn't need to modify the input
- * implement depth search scoring
- * variable board size
- * 
- * 
- * 
- * 
-*/
-
-
+using flag_t = int;
+using error_t = int;
 
 namespace constants
 {
@@ -26,26 +18,25 @@ namespace constants
 	constexpr int pointNumber{ constants::boardSize * constants::boardSize };
 	//used when needing to start an array from 1, or similar circumstances
 	constexpr int zeroOffset{ 1 };
-	//offset to turn ascii code from letter input into corresponding number on the board, e.g. A->1
+	//offset to turn ascii code from letter input into corresponding number on the board, e.g. A->0
 	constexpr int asciiOffset{ 64 };
 	//a similar concept for numbers
 	constexpr int asciiOffsetNum{ 48 };
-	constexpr int ERROR{ -2 };
+	constexpr error_t ERROR{ -2 };
 
 	//use for anything where I need to flag up a certain thing has happened
-	constexpr int flag{ -3 };
+	constexpr flag_t flag{ -3 };
 	//use for flagging that a player (but not both) have passed
-	constexpr int passFlag{ -3 };
+	constexpr flag_t passFlag{ -4 };
 
 	//use to flag that both players have passed and the game has ended
-	constexpr int endGameFlag{ -4 };
-
+	constexpr flag_t endGameFlag{ -5 };
 
 
 	//tools for debugging, 0 for no debug, 1 for debug mode
-	constexpr int isDebug{ 1 };
+	constexpr flag_t isDebug{ 1 };
 
-	const std::array<std::string, 17> defaultInput{ {"A9", "A8", "B9", "B8", "D8", "C9", "A9", "pass", "D9", "pass", "C7", "pass", "B7", "pass","B9", "C8", "A7"} };
+	const std::array<std::string, 21> defaultInput{ {"A9", "A8", "B9", "B8", "D8", "C9", "A9", "pass", "D9", "pass", "C7", "pass", "B7", "pass","B9", "C8", "B9", "J1", "pass", "A9", "pass"} };
 	//const std::array<std::string, 8> defaultInput{ {"F7", "A8", "F8", "A6", "G7", "C9", "G8", "G6"} };
 
 }
@@ -65,10 +56,6 @@ using neighbour_t = group_t;
 
 //type for array of letters on the top of the board
 using lettersArray_t = std::array<char, constants::boardSize>;
-
-// use an alias for the board type, can replace with a class later if I want
-class Stones;
-using board_t = std::array<Stones, constants::pointNumber>;
 
 namespace constants
 {

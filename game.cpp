@@ -4,42 +4,69 @@
 void Game::initialiseGame()
 {
 	std::cout << "\t\tGO BOARD GAME\t\t\n\n";
+	printTurnSetup();
 }
 
-//handles everything to do with each player's turn
-void Game::playerTurn(Stones::StoneColour& turnColour)
+
+void Game::printTurnSetup()
 {
-
-	if ((turnColour == Stones::StoneColour::black) || (turnColour == Stones::StoneColour::white))
-	{
-		Output output;
-		std::cout << output.printColour(static_cast<Stones::StoneColourCaps>(turnColour));
-		std::cout << "'s turn\n";
-		position_t position{ m_board.getMove() };
-		if (position == constants::endGameFlag)
-			m_isEndGame = true;
-		else if (position == constants::passFlag)
-			;
-		else
-			m_board.placeMove(turnColour, position);
-
-		InputValidator  inputValidator;
-		turnColour = inputValidator.switchColour(turnColour);
-	}
-	else
-	{
-		std::cout << "Error, unexpected turn";
-	}
-
+	m_board.displayBoard();
+	std::cout << Output::printColourCaps(getTurnColour());
+	std::cout << "'s turn\n";
 }
 
 void Game::gameplay()
 {
-	Stones::StoneColour turn{ Stones::StoneColour::black };
+	bool isValidMove{true};
+
 	while (!m_isEndGame)
 	{
-		m_board.displayBoard();
-		playerTurn(turn);
-		m_board.getScoreTracker().currentScore();
+
+		
+
+		position_t position{ m_board.getMove() };
+		if (position == constants::passFlag)
+		{
+			if (m_hasPassed)
+			{
+				//if there's a pass and the previous player passed, trigger the end game
+				m_isEndGame = true;
+			}
+			else
+			{
+				m_hasPassed = true;
+			}
+		}
+		else
+		{
+			//places the move and checks whether it's a suicide move or not, outputs into isValidMove
+			isValidMove = m_board.placeMove(getTurnColour(), position);
+			if (isValidMove)
+				m_hasPassed = false;
+		}
+
+		//if the last move was valid, print the corresponding text and switch turn, otherwise go round the loop again
+		if (isValidMove)
+		{
+			//switch turn
+			m_whichTurn = !m_whichTurn;
+
+			m_board.getScoreTracker().currentScore();
+			printTurnSetup();
+		}
+	}
+}
+
+StoneColour Game::getTurnColour()
+{
+	//m_whichTurn == true means it's white's turn
+	if (m_whichTurn)
+	{
+		return StoneColour::white;
+	}
+	//m_whichTurn == false means it's black's turn
+	else
+	{
+		return StoneColour::black;
 	}
 }
